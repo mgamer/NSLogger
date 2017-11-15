@@ -282,7 +282,7 @@
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VERSIONING_SYSTEM = "Semantic Versioning";
@@ -334,7 +334,7 @@
 				SKIP_INSTALL = YES;
 				SUPPORTED_PLATFORMS = "macosx iphoneos iphonesimulator appletvos appletvsimulator";
 				SWIFT_OPTIMIZATION_LEVEL = "-Owholemodule";
-				SWIFT_VERSION = 3.0;
+				SWIFT_VERSION = 2.3;
 				TARGETED_DEVICE_FAMILY = "1,2,3";
 				TVOS_DEPLOYMENT_TARGET = 9.0;
 				VALIDATE_PRODUCT = YES;

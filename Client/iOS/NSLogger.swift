@@ -51,6 +51,9 @@ public typealias Image = NSImage
 
 #endif
 
+// Swift 2.3 compatibility
+public typealias Data = NSData
+
 
 /// The main NSLogger class, use `shared` property to obtain an instance
 public final class Logger {
@@ -103,15 +106,11 @@ public final class Logger {
             guard let imageData = UIImagePNGRepresentation(image) else { return nil }
             return (imageData, Int(image.size.width), Int(image.size.height))
         #elseif os(OSX)
-          guard let tiff = image.tiffRepresentation,
+          guard let tiff = image.TIFFRepresentation,
             let bitmapRep = NSBitmapImageRep(data: tiff) else { return nil }
 
           let imageData: Data?
-          #if swift(>=3)
-            imageData = bitmapRep.representation(using: .PNG, properties: [:])
-          #else
-            imageData = bitmapRep.representation(using: NSPNGFileType, properties: [:])
-          #endif
+          imageData = bitmapRep.representationUsingType(NSPNGFileType, properties: [:])
 
           guard let data = imageData  else { return nil }
           return (data, Int(image.size.width), Int(image.size.height))
@@ -120,7 +119,7 @@ public final class Logger {
         #endif
     }
 
-    private func whenEnabled(then execute: () -> Void) {
+    private func whenEnabled(@noescape then execute: () -> Void) {
         #if !NSLOGGER_DISABLED || NSLOGGER_ENABLED
             execute()
         #endif
@@ -128,7 +127,7 @@ public final class Logger {
     
     public func log(_ domain: Domain,
                     _ level: Level,
-                    _ message: @autoclosure () -> String,
+                    @autoclosure _ message: () -> String,
                     _ file: String = #file,
                     _ line: Int = #line,
                     _ function: String = #function) {
@@ -139,7 +138,7 @@ public final class Logger {
     
     public func log(_ domain: Domain,
                     _ level: Level,
-                    _ image: @autoclosure () -> Image,
+                    @autoclosure _ image: () -> Image,
                     _ file: String = #file,
                     _ line: Int = #line,
                     _ function: String = #function) {
@@ -151,7 +150,7 @@ public final class Logger {
     
     public func log(_ domain: Domain,
                     _ level: Level,
-                    _ data: @autoclosure () -> Data,
+                    @autoclosure _ data: () -> Data,
                     _ file: String = #file,
                     _ line: Int = #line,
                     _ function: String = #function) {
