@@ -79,7 +79,7 @@ public final class Logger {
         public static let db = Domain(rawValue: "DB")
         public static let io = Domain(rawValue: "IO")
         
-        public static func custom(_ value: String) -> Domain {
+        public static func custom(value: String) -> Domain {
             return Domain(rawValue: value)
         }
     }
@@ -96,12 +96,12 @@ public final class Logger {
         public static let verbose = Level(rawValue: 5)
         public static let noise = Level(rawValue: 6)
         
-        public static func custom(_ value: Int) -> Level {
+        public static func custom(value: Int) -> Level {
             return Level(rawValue: value)
         }
     }
     
-    private func imageData(_ image: Image) -> (data: Data, width: Int, height: Int)? {
+    private func imageData(image: Image) -> (data: Data, width: Int, height: Int)? {
         #if os(iOS) || os(tvOS)
             guard let imageData = UIImagePNGRepresentation(image) else { return nil }
             return (imageData, Int(image.size.width), Int(image.size.height))
@@ -125,7 +125,7 @@ public final class Logger {
         #endif
     }
     
-    public func log(_ domain: Domain,
+    public func log(  domain: Domain,
                     _ level: Level,
                     @autoclosure _ message: () -> String,
                     _ file: String = #file,
@@ -136,7 +136,7 @@ public final class Logger {
         }
     }
     
-    public func log(_ domain: Domain,
+    public func log(  domain: Domain,
                     _ level: Level,
                     @autoclosure _ image: () -> Image,
                     _ file: String = #file,
@@ -148,7 +148,7 @@ public final class Logger {
         }
     }
     
-    public func log(_ domain: Domain,
+    public func log(  domain: Domain,
                     _ level: Level,
                     @autoclosure _ data: () -> Data,
                     _ file: String = #file,
