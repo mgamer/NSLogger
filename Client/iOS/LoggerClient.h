@@ -48,6 +48,16 @@
 // being included in the project, and potentially configure their macros accordingly
 #define NSLOGGER_WAS_HERE		1
 
+
+#define NSLOGGER_IGNORE_NULLABILITY_BEGIN \
+_Pragma("clang diagnostic push") \
+_Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
+
+#define NSLOGGER_IGNORE_NULLABILITY_END \
+_Pragma("clang diagnostic pop")
+
+
+
 /* -----------------------------------------------------------------
  * Logger option flags & default options
  * -----------------------------------------------------------------
@@ -72,6 +82,13 @@ enum {
 // The Logger struct is no longer public, use the new LoggerGet[...] functions instead
 typedef struct Logger Logger;
 
+NSLOGGER_IGNORE_NULLABILITY_BEGIN
+
+typedef void (*LoggerDidConnectCallBack)(Logger *logger, void *context);
+typedef void (*LoggerDidDisconnectCallBack)(Logger *logger, void *context);
+
+NSLOGGER_IGNORE_NULLABILITY_END
+
 /* -----------------------------------------------------------------
  * LOGGING FUNCTIONS
  * -----------------------------------------------------------------
@@ -90,14 +107,7 @@ extern "C" {
 #else
 #define NSLOGGER_NOSTRIP
 #endif
-    
-#define NSLOGGER_IGNORE_NULLABILITY_BEGIN \
-    _Pragma("clang diagnostic push") \
-    _Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
-    
-#define NSLOGGER_IGNORE_NULLABILITY_END \
-    _Pragma("clang diagnostic pop")
-    
+
 NSLOGGER_IGNORE_NULLABILITY_BEGIN
 
 // Set the default logger which will be the one used when passing NULL for logge
@@ -120,6 +130,10 @@ extern Logger* LoggerInit(void) NSLOGGER_NOSTRIP;
 // Set logger options if you don't want the default options (see above)
 extern void LoggerSetOptions(Logger *logger, uint32_t options) NSLOGGER_NOSTRIP;
 extern uint32_t LoggerGetOptions(Logger *logger) NSLOGGER_NOSTRIP;
+    
+// Set logger callbacks
+extern void LoggerSetConnectCallBack(Logger *logger, LoggerDidConnectCallBack callback, void *context) NSLOGGER_NOSTRIP;
+extern void LoggerSetDisconnectCallBack(Logger *logger, LoggerDidDisconnectCallBack callback, void *context) NSLOGGER_NOSTRIP;
 
 // Set Bonjour logging names, so you can force the logger to use a specific service type
 // or direct logs to the machine on your network which publishes a specific name
