@@ -164,6 +164,10 @@ struct Logger
 	BOOL connected;                                 // Set to YES once the write stream declares the connection open
 	volatile BOOL quit;                             // Set to YES to terminate the logger worker thread's runloop
 	BOOL incompleteSendOfFirstItem;                 // set to YES if we are sending the first item in the queue and it's bigger than what the buffer can hold
+    
+    // logger callbacks
+    LoggerDidConnectCallBack connectCallBack;       // callback for logger connected event
+    LoggerDidDisconnectCallBack disconnectCallBack; // callback for logger disconnected event
 };
 
 /* Local prototypes */
@@ -618,6 +622,17 @@ static void LoggerDbg(CFStringRef format, ...)
 	}
 }
 #endif
+
+// Set logger callbacks
+void LoggerSetConnectCallBack(Logger *logger, LoggerDidConnectCallBack callback) {
+    logger = logger ?: LoggerGetDefaultLogger();
+    logger->connectCallBack = callback;
+}
+
+void LoggerSetDisconnectCallBack(Logger *logger, LoggerDidDisconnectCallBack callback) {
+    logger = logger ?: LoggerGetDefaultLogger();
+    logger->disconnectCallBack = callback;
+}
 
 // -----------------------------------------------------------------------------
 #pragma mark -
@@ -2071,8 +2086,9 @@ static void LoggerTryConnect(Logger *logger)
 static void LoggerWriteStreamTerminated(Logger *logger)
 {
 	LOGGERDBG(CFSTR("LoggerWriteStreamTerminated called"));
+    BOOL wasConnected = logger->connected;
 
-	if (logger->connected)
+	if (wasConnected)
 	{
 		LOGGERDBG(CFSTR("-> Logger DISCONNECTED"));
 		logger->connected = NO;
@@ -2107,6 +2123,11 @@ static void LoggerWriteStreamTerminated(Logger *logger)
 
 	// ensure that any current block on LoggerFlush() gets unblocked
 	pthread_cond_broadcast(&logger->logQueueEmpty);
+    
+    LoggerDidDisconnectCallBack callback = logger->disconnectCallBack;
+    if (callback) {
+        callback(logger);
+    }
 
 	// tryConnect will take care of setting up the reconnect timer if needed
 	if (logger->targetReachable &&
@@ -2141,6 +2162,13 @@ static void LoggerWriteStreamCallback(CFWriteStreamRef ws, CFStreamEventType eve
 				LoggerCreateBufferReadStream(logger);
 			}
 			LoggerPushClientInfoToFrontOfQueue(logger);
+            
+            LoggerDidConnectCallBack callback = logger->connectCallBack;
+            
+            if (callback) {
+                callback(logger);
+            }
+            
 			LoggerWriteMoreData(logger);
 			break;
 			
