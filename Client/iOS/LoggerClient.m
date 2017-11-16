@@ -167,7 +167,9 @@ struct Logger
     
     // logger callbacks
     LoggerDidConnectCallBack connectCallBack;       // callback for logger connected event
+    void *connectCallBackContext;
     LoggerDidDisconnectCallBack disconnectCallBack; // callback for logger disconnected event
+    void *disconnectCallBackContext;
 };
 
 /* Local prototypes */
@@ -624,13 +626,15 @@ static void LoggerDbg(CFStringRef format, ...)
 #endif
 
 // Set logger callbacks
-void LoggerSetConnectCallBack(Logger *logger, LoggerDidConnectCallBack callback) {
+void LoggerSetConnectCallBack(Logger *logger, LoggerDidConnectCallBack callback, void *context) {
     logger = logger ?: LoggerGetDefaultLogger();
+    logger->connectCallBackContext = context;
     logger->connectCallBack = callback;
 }
 
-void LoggerSetDisconnectCallBack(Logger *logger, LoggerDidDisconnectCallBack callback) {
+void LoggerSetDisconnectCallBack(Logger *logger, LoggerDidDisconnectCallBack callback, void *context) {
     logger = logger ?: LoggerGetDefaultLogger();
+    logger->disconnectCallBackContext = context;
     logger->disconnectCallBack = callback;
 }
 
@@ -2125,8 +2129,9 @@ static void LoggerWriteStreamTerminated(Logger *logger)
 	pthread_cond_broadcast(&logger->logQueueEmpty);
     
     LoggerDidDisconnectCallBack callback = logger->disconnectCallBack;
+    void *context = logger->disconnectCallBackContext;
     if (callback) {
-        callback(logger);
+        callback(logger, context);
     }
 
 	// tryConnect will take care of setting up the reconnect timer if needed
@@ -2164,11 +2169,11 @@ static void LoggerWriteStreamCallback(CFWriteStreamRef ws, CFStreamEventType eve
 			LoggerPushClientInfoToFrontOfQueue(logger);
             
             LoggerDidConnectCallBack callback = logger->connectCallBack;
-            
+            void *context = logger->connectCallBackContext;
             if (callback) {
-                callback(logger);
+                callback(logger, context);
             }
-            
+
 			LoggerWriteMoreData(logger);
 			break;
 			

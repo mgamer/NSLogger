@@ -72,8 +72,8 @@ enum {
 // The Logger struct is no longer public, use the new LoggerGet[...] functions instead
 typedef struct Logger Logger;
 
-typedef void (*LoggerDidConnectCallBack)(Logger *logger);
-typedef void (*LoggerDidDisconnectCallBack)(Logger *logger);
+typedef void (*LoggerDidConnectCallBack)(Logger *logger, void *context);
+typedef void (*LoggerDidDisconnectCallBack)(Logger *logger, void *context);
 
 /* -----------------------------------------------------------------
  * LOGGING FUNCTIONS
@@ -125,8 +125,8 @@ extern void LoggerSetOptions(Logger *logger, uint32_t options) NSLOGGER_NOSTRIP;
 extern uint32_t LoggerGetOptions(Logger *logger) NSLOGGER_NOSTRIP;
     
 // Set logger callbacks
-extern void LoggerSetConnectCallBack(Logger *logger, LoggerDidConnectCallBack callback);
-extern void LoggerSetDisconnectCallBack(Logger *logger, LoggerDidDisconnectCallBack callback);
+extern void LoggerSetConnectCallBack(Logger *logger, LoggerDidConnectCallBack callback, void *context);
+extern void LoggerSetDisconnectCallBack(Logger *logger, LoggerDidDisconnectCallBack callback, void *context);
 
 // Set Bonjour logging names, so you can force the logger to use a specific service type
 // or direct logs to the machine on your network which publishes a specific name
