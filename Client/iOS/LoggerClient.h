@@ -48,6 +48,16 @@
 // being included in the project, and potentially configure their macros accordingly
 #define NSLOGGER_WAS_HERE		1
 
+
+#define NSLOGGER_IGNORE_NULLABILITY_BEGIN \
+_Pragma("clang diagnostic push") \
+_Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
+
+#define NSLOGGER_IGNORE_NULLABILITY_END \
+_Pragma("clang diagnostic pop")
+
+
+
 /* -----------------------------------------------------------------
  * Logger option flags & default options
  * -----------------------------------------------------------------
@@ -72,8 +82,12 @@ enum {
 // The Logger struct is no longer public, use the new LoggerGet[...] functions instead
 typedef struct Logger Logger;
 
+NSLOGGER_IGNORE_NULLABILITY_BEGIN
+
 typedef void (*LoggerDidConnectCallBack)(Logger *logger, void *context);
 typedef void (*LoggerDidDisconnectCallBack)(Logger *logger, void *context);
+
+NSLOGGER_IGNORE_NULLABILITY_END
 
 /* -----------------------------------------------------------------
  * LOGGING FUNCTIONS
@@ -93,14 +107,7 @@ extern "C" {
 #else
 #define NSLOGGER_NOSTRIP
 #endif
-    
-#define NSLOGGER_IGNORE_NULLABILITY_BEGIN \
-    _Pragma("clang diagnostic push") \
-    _Pragma("clang diagnostic ignored \"-Wnullability-completeness\"")
-    
-#define NSLOGGER_IGNORE_NULLABILITY_END \
-    _Pragma("clang diagnostic pop")
-    
+
 NSLOGGER_IGNORE_NULLABILITY_BEGIN
 
 // Set the default logger which will be the one used when passing NULL for logge
