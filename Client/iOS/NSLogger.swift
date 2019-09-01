@@ -108,7 +108,7 @@ public final class Logger {
 
           let imageData: Data?
           #if swift(>=3)
-            imageData = bitmapRep.representation(using: .PNG, properties: [:])
+            imageData = bitmapRep.representation(using: .png, properties: [:])
           #else
             imageData = bitmapRep.representation(using: NSPNGFileType, properties: [:])
           #endif
